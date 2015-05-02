@@ -1,6 +1,6 @@
 # NAME
 
-Mojo::Pg - Mojolicious ♥ PostgreSQL ♥ ORM
+Mojo::Pg::ORM - Mojolicious ♥ PostgreSQL ♥ ORM
 
 # SYNOPSIS
 

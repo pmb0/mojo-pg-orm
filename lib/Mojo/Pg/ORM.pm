@@ -57,7 +57,7 @@ sub model($self, $name) {
 
 =head1 NAME
 
-Mojo::Pg - Mojolicious ♥ PostgreSQL ♥ ORM
+Mojo::Pg::ORM - Mojolicious ♥ PostgreSQL ♥ ORM
 
 =head1 SYNOPSIS
 
