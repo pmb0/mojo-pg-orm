@@ -79,12 +79,26 @@ sub _search($self, $table, $fields, $where, $cb = undef) {
     $self->orm->pg->db->query(@sql, $cb);
 }
 
-sub find($self, $id) {
-    $self->_collapse($self->_search(
-        $self->table,
-        undef,
-        ref($id) ? $id : {$self->pk->[0] => $id}
-    )->hash);
+sub find($self, $id, $cb) {
+
+    my $where = ref($id) ? $id : {$self->pk->[0] => $id};
+
+    # blocking
+    if (not defined $cb) {
+        $self->_collapse($self->_search(
+            $self->table,
+            undef,
+            $where
+        )->hash);
+    }
+
+    # non-blocking
+    $self->_search($self->table, undef, $where, sub($db, $err, $result) {
+        $cb->(
+            $err,
+            $self->_collapse($result->hash)
+        );
+    });
 }
 
 sub all { shift->search(undef, @_) }

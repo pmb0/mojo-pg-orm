@@ -48,6 +48,14 @@ get '/non-blocking' => sub {
     });
 };
 
+get '/non-blocking/:id' => sub {
+    my $c = shift;
+    $c->orm->model('Posting')->find($c->param('id'), sub {
+        my ($err, $posting) = @_;
+        $c->render(text => $posting->{title});
+    });
+};
+
 del '/non-blocking' => sub {
     my $c = shift;
     $c->orm->model('Posting')->remove(undef, sub {
