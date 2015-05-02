@@ -25,13 +25,30 @@ THIS IS EXPERIMENTAL SOFTWARE. USE AT YOUR OWN RISK.
 
     helper orm => sub { state $orm = My::Model->new($connection) };
 
-    get '/non-blocking' => sub {
+    # non-blocking
+    get '/postings/:id' => sub {
+        my $c = shift;
+        $c->orm->model('Posting')->find($c->param('id'), sub {
+            my ($err, $posting) = @_;
+            $c->render(text => $posting->{title});
+        });
+    };
+
+    # non-blocking
+    get '/postings' => sub {
         my $c = shift;
         $c->orm->model('Posting')->search(undef, sub {
-            my ($err, $rows) = @_;
-            my $text = $rows->map(sub { shift->{title} })->join(' xxx ');
-            $c->render(text => $text);
+            my ($err, $postings) = @_;
+            $c->stash(postings => $postings);
+            $c->render;
         });
+    };
+
+    # blocking
+    get '/postings' => sub {
+        my $c = shift;
+        $c->stash(postings => $c->orm->model('Posting')->all);
+        $c->render;
     };
 
 # DESCRIPTION
