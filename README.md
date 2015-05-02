@@ -11,7 +11,7 @@ THIS IS EXPERIMENTAL SOFTWARE. USE AT YOUR OWN RISK.
     # That's it
 
     package My::Model::Posting;
-    use Mojo::Base 'Mojo::Pg::ORM::Schema';
+    use Mojo::Base 'Mojo::Pg::ORM::Model';
     use experimental 'signatures';
 
     sub hello($self) {
