@@ -30,8 +30,8 @@ sub _pk_where($self) {
     return {map { $_ => $self->{$_} } @{$self->schema->pk}};
 }
 
-sub update($self, $data) {
-    $self->schema->update($data, $self->_pk_where);
+sub update($self, $data, $cb = undef) {
+    $self->schema->update($data, $self->_pk_where, $cb);
 }
 
 sub remove($self) {
