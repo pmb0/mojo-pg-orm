@@ -19,8 +19,8 @@ use Mojolicious::Lite;
 
 helper orm => sub { state $orm = My::Model->new($ENV{TEST_ONLINE}) };
 
-app->orm->pg->db->query('create table if not exists postings (id serial primary key, title text, content text)');
-app->orm->pg->db->query('delete from postings');
+app->orm->pg->db->query('drop table if exists postings');
+app->orm->pg->db->query('create table postings (id serial primary key, title text, content text, foo text, created timestamp)');
 
 app->orm->initialize;  # table created
 

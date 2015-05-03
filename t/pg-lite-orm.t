@@ -16,8 +16,8 @@ plan skip_all => 'set TEST_ONLINE to enable this test'
   unless $ENV{TEST_ONLINE};
 
 my $orm = My::Model->new($ENV{TEST_ONLINE});
-$orm->pg->db->query('create table if not exists postings (id serial primary key, title text, content text)');
-$orm->pg->db->query('delete from postings');
+$orm->pg->db->query('drop table if exists postings');
+$orm->pg->db->query('create table postings (id serial primary key, title text, content text, foo text, created timestamp)');
 
 $orm->initialize;  # table created
 
