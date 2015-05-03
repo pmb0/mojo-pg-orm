@@ -94,16 +94,14 @@ THIS IS EXPERIMENTAL SOFTWARE. USE AT YOUR OWN RISK.
 
   # non-blocking
   get '/postings/:id' => sub($c) {
-      $c->orm->model('Posting')->find($c->param('id'), sub {
-          my ($err, $posting) = @_;
+      $c->orm->model('Posting')->find($c->param('id'), sub($err, $posting) {
           $c->render(text => $posting->{title});
       });
   };
 
   # non-blocking
   get '/postings' => sub($c) {
-      $c->orm->model('Posting')->search(undef, sub {
-          my ($err, $postings) = @_;
+      $c->orm->model('Posting')->search(undef, sub($err, $posting) {
           $c->stash(postings => $postings);
           $c->render;
       });
