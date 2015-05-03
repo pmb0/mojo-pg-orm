@@ -253,6 +253,12 @@ Searches for a row using its ID.
 Constructs a L<Mojo::Pg::ORM::Schema> object. Retrieves current column list
 from the database.
 
+=head2 on
+
+  $schema->on($event => $cb);
+
+Subscribe to event.
+
 =head2 remove
 
   $schema->remove(\%where?);
