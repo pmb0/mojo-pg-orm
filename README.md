@@ -1,30 +1,13 @@
-# NAME
+# Mojo::Pg::ORM [![Build Status](https://travis-ci.org/pmb0/mojo-pg-orm.svg?branch=master)](https://travis-ci.org/pmb0/mojo-pg-orm)
 
-Mojo::Pg::ORM - Mojolicious ♥ PostgreSQL ♥ ORM
+A simple blocking and non-blocking object relational mapper for Mojolicious
+and PostgreSQL.
 
-# SYNOPSIS
+*THIS IS EXPERIMENTAL SOFTWARE. USE AT YOUR OWN RISK.*
 
-THIS IS EXPERIMENTAL SOFTWARE. USE AT YOUR OWN RISK.
+1. Create a `Mojolicious` application
 
-    # Model class for the table "postings"
-    package My::Model::Posting;
-    use Mojo::Base 'Mojo::Pg::ORM::Model';
-    use experimental 'signatures';
-
-    use Mojo::Date;
-
-    hook before_create => sub($self) {
-        $self->{created} = Mojo::Date->new;
-    }
-
-    sub hello($self) {
-        return 'Hello, ' . $self->{title};
-    }
-
-    # Base class to be instantiated in main
-    package My::Model;
-    use Mojo::Base 'Mojo::Pg::ORM';
-
+    ```perl
     # Mojolicious::Lite example app
     package main;
     use Mojolicious::Lite;
@@ -55,39 +38,35 @@ THIS IS EXPERIMENTAL SOFTWARE. USE AT YOUR OWN RISK.
         $c->stash(postings => $c->orm->model('Posting')->all);
         $c->render;
     };
+    ```
 
-# DESCRIPTION
+2. Create `My::Model` class
 
-A simple blocking and non-blocking object relational mapper for Mojolicious
-and PostgreSQL.
+    ```perl
+    # Base class to be instantiated in main
+    package My::Model;
+    use Mojo::Base 'Mojo::Pg::ORM';
+    ```
 
-# ATTRIBUTES
+3. Create `Mojo::Pg::ORM::Model` classes
 
-## pg
+    ```perl
+    # Model class for the table "postings"
+    package My::Model::Posting;
+    use Mojo::Base 'Mojo::Pg::ORM::Model';
+    use experimental 'signatures';
 
-The [Mojo::Pg](https://metacpan.org/pod/Mojo::Pg) object used for low level operations.
+    use Mojo::Date;
 
-## schemas
+    hook before_create => sub($self) {
+        $self->{created} = Mojo::Date->new;
+    }
 
-Key-value-map of [Mojo::Pg::ORM::Model](https://metacpan.org/pod/Mojo::Pg::ORM::Model) class names and [Mojo::Pg::ORM::Schema](https://metacpan.org/pod/Mojo::Pg::ORM::Schema)
-objects. These objects hold information about primary keys, columns and so on for
-the [Mojo::Pg::ORM::Model](https://metacpan.org/pod/Mojo::Pg::ORM::Model) class.
+    sub hello($self) {
+        return 'Hello, ' . $self->{title};
+    }
+    ```
 
-# METHODS
 
-## initialize
 
-Loads and initializes table schema information classes.
 
-## model
-
-    my $model = $orm->model('Posting');
-    my $rows = $model->all;
-
-Returns a [Mojo::Pg::ORM::Model](https://metacpan.org/pod/Mojo::Pg::ORM::Model) object of the given name.
-
-## new
-
-    my $orm = Mojo::Pg::ORM->new($connection, %options?);
-
-Constructs a [Mojo::Pg::ORM](https://metacpan.org/pod/Mojo::Pg::ORM) object.
