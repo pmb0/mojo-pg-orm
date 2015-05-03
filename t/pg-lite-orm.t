@@ -19,6 +19,8 @@ my $orm = My::Model->new($ENV{TEST_ONLINE});
 $orm->pg->db->query('create table if not exists postings (id serial primary key, title text, content text)');
 $orm->pg->db->query('delete from postings');
 
+$orm->initialize;  # table created
+
 my $postings = $orm->model('Posting');
 is ref($postings) => 'Mojo::Pg::ORM::Schema';
 

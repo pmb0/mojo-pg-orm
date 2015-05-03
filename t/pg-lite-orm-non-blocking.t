@@ -22,6 +22,8 @@ helper orm => sub { state $orm = My::Model->new($ENV{TEST_ONLINE}) };
 app->orm->pg->db->query('create table if not exists postings (id serial primary key, title text, content text)');
 app->orm->pg->db->query('delete from postings');
 
+app->orm->initialize;  # table created
+
 # Create
 put '/non-blocking' => sub {
     my $c = shift;

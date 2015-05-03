@@ -23,6 +23,8 @@ my $orm = My::Model->new(
 $orm->pg->db->query('drop table if exists postings');
 $orm->pg->db->query('create table postings (id serial primary key, title text, content text, foo text, created timestamp)');
 
+$orm->initialize;  # table created
+
 my $postings = $orm->model('Posting');
 
 # Test create hooks
