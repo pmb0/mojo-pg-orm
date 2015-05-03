@@ -17,8 +17,8 @@ WriteMakefile(
     no_index => {directory => ['t']}
   },
   PREREQ_PM => {
-    'DBD::Pg'             => 0,
     'Lingua::EN::Inflect' => 0,
+    'Mojo::Pg'            => 0,
     'SQL::Abstract'       => 0,
     Mojolicious           => '6.0',
   },
