@@ -5,12 +5,14 @@ use experimental 'signatures';
 use Mojo::Loader qw(find_modules load_class);
 use Mojo::Pg::ORM::Schema;
 use Mojo::Pg;
+use Mojolicious::Validator;
 use Scalar::Util 'weaken';
 
-has [qw(connection validator)];
-has _sql    => sub { SQL::Abstract->new };
-has pg      => sub { Mojo::Pg->new(shift->connection) };
-has schemas => sub { {} };
+has 'connection';
+has _sql      => sub { SQL::Abstract->new };
+has pg        => sub { Mojo::Pg->new(shift->connection) };
+has schemas   => sub { {} };
+has validator => sub { Mojolicious::Validator->new };
 
 sub new {
     my $self = shift->SUPER::new(connection => shift, @_);
