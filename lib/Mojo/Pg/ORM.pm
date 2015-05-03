@@ -20,7 +20,7 @@ sub new {
     my $self = shift->SUPER::new(connection => shift, @_);
 
     die 'Usage: Mojo::Pg::ORM->new($connection, $options?)'
-      unless $self->connection;
+        unless $self->connection;
 
     $self->initialize;
 
@@ -47,6 +47,7 @@ sub initialize($self) {
             orm      => $self,
             relation => $self->_get_relation_name($module),
         );
+
         # $module->initialize($self);
     }
 }

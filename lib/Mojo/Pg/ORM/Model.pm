@@ -7,7 +7,7 @@ use Mojo::Util 'monkey_patch';
 has 'schema';
 
 sub import {
-    my $class = shift;
+    my $class  = shift;
     my $caller = caller;
     monkey_patch $caller, events => sub { state $hooks = {} };
     monkey_patch $caller, hook => sub($hook, $cb) {
@@ -17,7 +17,7 @@ sub import {
 
 sub id($self) {
     my $pk = $self->schema->pk;
-    my @ids = map {$self->{$_}} @$pk;
+    my @ids = map { $self->{$_} } @$pk;
     return $ids[0] if @ids == 1;
     return \@ids;
 }
@@ -27,9 +27,7 @@ sub columns($self) {
 }
 
 sub _pk_where($self) {
-    return {
-        map { $_ => $self->{$_} } @{$self->schema->pk}
-    };
+    return {map { $_ => $self->{$_} } @{$self->schema->pk}};
 }
 
 sub update($self, $data) {
@@ -41,9 +39,7 @@ sub remove($self) {
 }
 
 sub TO_JSON($self) {
-    return {
-        map {$_ => $self->{$_}} $self->columns
-    };
+    return {map { $_ => $self->{$_} } $self->columns};
 }
 
 1;

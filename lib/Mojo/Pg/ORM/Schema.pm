@@ -17,6 +17,7 @@ has table    => sub { PL(decamelize shift->relation) };
 
 sub new {
     my $self = shift->SUPER::new(@_);
+
     # $self->_sql->{debug} = 1;
     $self->retrieve_columns;
     return $self;
@@ -63,8 +64,7 @@ sub _get_pk($self) {
        AND indisprimary
     };
     return $self->_query($sql, $self->table)
-      ->hashes->map(sub{$_->{attname}})
-      ->to_array;
+        ->hashes->map(sub { $_->{attname} })->to_array;
 }
 
 sub _query($self, @params) {
@@ -72,15 +72,15 @@ sub _query($self, @params) {
 }
 
 sub _collapse($self, $data) {
-    return $self->class->new(schema => $self, %$data );
+    return $self->class->new(schema => $self, %$data);
 }
 
 sub _search($self, $table, $fields, $where, $cb = undef) {
     my @sql = $self->orm->_sql->select($table, $fields, $where);
-    # $self->debug && say $sql[0] . ' <<< ' . (join(', ', $sql[1]) || '(none)');
 
-    return $self->orm->pg->db->query(@sql)
-      unless defined $cb;
+   # $self->debug && say $sql[0] . ' <<< ' . (join(', ', $sql[1]) || '(none)');
+
+    return $self->orm->pg->db->query(@sql) unless defined $cb;
 
     $self->orm->pg->db->query(@sql, $cb);
 }
@@ -90,20 +90,18 @@ sub find($self, $id, $cb = undef) {
 
     # blocking
     if (not defined $cb) {
-        return $self->_collapse($self->_search(
-            $self->table,
-            undef,
-            $where
-        )->hash);
+        return $self->_collapse(
+            $self->_search($self->table, undef, $where)->hash);
     }
 
     # non-blocking
-    $self->_search($self->table, undef, $where, sub($db, $err, $result) {
-        $cb->(
-            $err,
-            $self->_collapse($result->hash)
-        );
-    });
+    $self->_search(
+        $self->table,
+        undef, $where,
+        sub($db, $err, $result) {
+            $cb->($err, $self->_collapse($result->hash));
+        }
+    );
 }
 
 sub all { shift->search(undef, @_) }
@@ -112,39 +110,40 @@ sub search($self, $where, $cb = undef) {
 
     # blocking
     if (not defined $cb) {
-        return $self
-          ->_search($self->table, undef, $where)
-          ->hashes
-          ->map(sub { $self->_collapse($_) });
+        return $self->_search($self->table, undef, $where)
+            ->hashes->map(sub { $self->_collapse($_) });
     }
 
     # non-blocking
-    $self->_search($self->table, undef, $where, sub($db, $err, $results) {
-        $cb->(
-            $err,
-            $results->hashes->map(sub{ $self->_collapse($_) })
-        );
-    });
+    $self->_search(
+        $self->table,
+        undef, $where,
+        sub($db, $err, $results) {
+            $cb->($err, $results->hashes->map(sub { $self->_collapse($_) }));
+        }
+    );
 }
 
 sub add($self, $row, $cb = undef) {
     my $validator = $self->orm->validator;
     $self->emit('before_create', $row, $validator->validation);
 
-    my @sql = $self->orm->_sql->insert($self->table, $row, {
-        returning => [keys %{$self->columns}],
-    });
+    my @sql = $self->orm->_sql->insert($self->table, $row,
+        {returning => [keys %{$self->columns}],});
+
     # $self->debug && say $sql[0];
 
     weaken $self;
 
-    return $self->_collapse(
-        $self->orm->pg->db->query(@sql)->hash
-    ) unless defined $cb;
+    return $self->_collapse($self->orm->pg->db->query(@sql)->hash)
+        unless defined $cb;
 
-    $self->orm->pg->db->query(@sql, sub($db, $err, $results) {
-        $cb->($err, $self->_collapse($results->hash));
-    });
+    $self->orm->pg->db->query(
+        @sql,
+        sub($db, $err, $results) {
+            $cb->($err, $self->_collapse($results->hash));
+        }
+    );
 }
 
 # update($data, sub {})
@@ -156,40 +155,45 @@ sub update {
     my $where;
     if (ref($cb) eq 'CODE') {
         $where = shift // {};
-    } else {
+    }
+    else {
         $where = $cb;
-        $cb = undef;
+        $cb    = undef;
     }
 
     my @sql = $self->orm->_sql->update($self->table, $data, $where);
     $sql[0] .= ' returning ' . join(', ', keys %{$self->columns});
+
     # $self->debug && say $sql[0];
 
-    return $self->orm->pg->db->query(@sql)
-      unless defined $cb;
+    return $self->orm->pg->db->query(@sql) unless defined $cb;
 
-    $self->orm->pg->db->query(@sql, sub($db, $err, $results) {
-        $cb->($err, $self->_collapse($results->hash));
-    });
+    $self->orm->pg->db->query(
+        @sql,
+        sub($db, $err, $results) {
+            $cb->($err, $self->_collapse($results->hash));
+        }
+    );
 }
 
 sub remove {
     my $self = shift;
-    my $cb = pop @_;
+    my $cb   = pop @_;
     my $where;
     if (ref($cb) eq 'CODE') {
         $where = shift // {};
-    } else {
+    }
+    else {
         $where = $cb;
-        $cb = undef;
+        $cb    = undef;
     }
 
     my @sql = $self->orm->_sql->delete($self->table, $where);
+
     # $self->debug && say $sql[0] . ' ## ' . $sql[1];
 
     # blocking
-    return $self->orm->pg->db->query(@sql)
-      unless defined $cb;
+    return $self->orm->pg->db->query(@sql) unless defined $cb;
 
     # non-blocking
     $self->orm->pg->db->query(@sql, $cb);
