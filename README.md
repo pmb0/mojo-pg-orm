@@ -6,28 +6,37 @@ Mojo::Pg::ORM - Mojolicious ♥ PostgreSQL ♥ ORM
 
 THIS IS EXPERIMENTAL SOFTWARE. USE AT YOUR OWN RISK.
 
-    package My::Model;
-    use Mojo::Base 'Mojo::Pg::ORM';
-    # That's it
-
+    # Model class for the table "postings"
     package My::Model::Posting;
     use Mojo::Base 'Mojo::Pg::ORM::Model';
     use experimental 'signatures';
+
+    use Mojo::Date;
+
+    hook before_create => sub($self) {
+        $self->{created} = Mojo::Date->new;
+    }
 
     sub hello($self) {
         return 'Hello, ' . $self->{title};
     }
 
+    # Base class to be instantiated in main
+    package My::Model;
+    use Mojo::Base 'Mojo::Pg::ORM';
+
+    # Mojolicious::Lite example app
     package main;
+    use Mojolicious::Lite;
+    use experimental 'signatures';
 
     use Mojo::Pg::ORM;
-    use Mojolicious::Lite;
+    use My::Model;
 
     helper orm => sub { state $orm = My::Model->new($connection) };
 
     # non-blocking
-    get '/postings/:id' => sub {
-        my $c = shift;
+    get '/postings/:id' => sub($c) {
         $c->orm->model('Posting')->find($c->param('id'), sub {
             my ($err, $posting) = @_;
             $c->render(text => $posting->{title});
@@ -35,8 +44,7 @@ THIS IS EXPERIMENTAL SOFTWARE. USE AT YOUR OWN RISK.
     };
 
     # non-blocking
-    get '/postings' => sub {
-        my $c = shift;
+    get '/postings' => sub($c) {
         $c->orm->model('Posting')->search(undef, sub {
             my ($err, $postings) = @_;
             $c->stash(postings => $postings);
@@ -45,8 +53,7 @@ THIS IS EXPERIMENTAL SOFTWARE. USE AT YOUR OWN RISK.
     };
 
     # blocking
-    get '/postings' => sub {
-        my $c = shift;
+    get '/postings' => sub($c) {
         $c->stash(postings => $c->orm->model('Posting')->all);
         $c->render;
     };

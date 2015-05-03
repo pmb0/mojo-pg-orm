@@ -22,6 +22,12 @@ sub new {
     return $self;
 }
 
+# Mojo::Eventemitter not working on classes:
+# Can't use string ("Mojo::Pg::ORM::Model") as a HASH ref while "strict refs" in use
+sub emit($self, $name, @args) {
+    $_->(@args) for @{$self->class->events->{$name} // []};
+}
+
 sub retrieve_columns($self) {
 
     # Retrieve table columns
@@ -118,6 +124,8 @@ sub search($self, $where, $cb = undef) {
 }
 
 sub add($self, $row, $cb = undef) {
+    $self->emit(before_create => $row);
+
     my @sql = $self->orm->_sql->insert($self->table, $row, {
         returning => [keys %{$self->columns}],
     });
@@ -221,6 +229,12 @@ Inserts a new row.
   my $collection = $schema->all(sub($err, $collection) {...}?);
 
 Returns all rows of the table.
+
+=head2 emit
+
+  $schema->emit($name, @args);
+
+Emits an event.
 
 =head2 find
 

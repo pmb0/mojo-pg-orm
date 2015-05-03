@@ -1,8 +1,19 @@
 package Mojo::Pg::ORM::Model;
-use Mojo::Base -base;
+use Mojo::Base '-base';
 use experimental 'signatures';
 
+use Mojo::Util 'monkey_patch';
+
 has 'schema';
+
+sub import {
+    my $class = shift;
+    my $caller = caller;
+    monkey_patch $caller, events => sub { state $hooks = {} };
+    monkey_patch $caller, hook => sub($hook, $cb) {
+        push @{$caller->events->{$hook}}, $cb;
+    };
+}
 
 sub id($self) {
     my $pk = $self->schema->pk;
