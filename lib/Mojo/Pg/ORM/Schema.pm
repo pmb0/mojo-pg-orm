@@ -79,13 +79,12 @@ sub _search($self, $table, $fields, $where, $cb = undef) {
     $self->orm->pg->db->query(@sql, $cb);
 }
 
-sub find($self, $id, $cb) {
-
+sub find($self, $id, $cb = undef) {
     my $where = ref($id) ? $id : {$self->pk->[0] => $id};
 
     # blocking
     if (not defined $cb) {
-        $self->_collapse($self->_search(
+        return $self->_collapse($self->_search(
             $self->table,
             undef,
             $where
