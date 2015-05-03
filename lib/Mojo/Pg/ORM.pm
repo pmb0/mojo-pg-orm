@@ -14,6 +14,8 @@ has pg        => sub { Mojo::Pg->new(shift->connection) };
 has schemas   => sub { {} };
 has validator => sub { Mojolicious::Validator->new };
 
+our $VERSION = '0.01';
+
 sub new {
     my $self = shift->SUPER::new(connection => shift, @_);
 
