@@ -28,6 +28,10 @@ sub emit($self, $name, @args) {
     $_->(@args) for @{$self->class->events->{$name} // []};
 }
 
+sub on($self, $name, $cb) {
+    push @{$self->class->events->{$name}}, $cb;
+}
+
 sub retrieve_columns($self) {
 
     # Retrieve table columns
@@ -124,7 +128,8 @@ sub search($self, $where, $cb = undef) {
 }
 
 sub add($self, $row, $cb = undef) {
-    $self->emit(before_create => $row);
+    my $validator = $self->orm->validator;
+    $self->emit('before_create', $row, $validator->validation);
 
     my @sql = $self->orm->_sql->insert($self->table, $row, {
         returning => [keys %{$self->columns}],

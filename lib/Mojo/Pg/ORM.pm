@@ -7,7 +7,7 @@ use Mojo::Pg::ORM::Schema;
 use Mojo::Pg;
 use Scalar::Util 'weaken';
 
-has 'connection';
+has [qw(connection validator)];
 has _sql    => sub { SQL::Abstract->new };
 has pg      => sub { Mojo::Pg->new(shift->connection) };
 has schemas => sub { {} };
