@@ -64,7 +64,7 @@ sub _get_pk($self) {
        AND indisprimary
     };
     return $self->_query($sql, $self->table)
-        ->hashes->map(sub { $_->{attname} })->to_array;
+      ->hashes->map(sub { $_->{attname} })->to_array;
 }
 
 sub _query($self, @params) {
@@ -111,7 +111,7 @@ sub search($self, $where, $cb = undef) {
     # blocking
     if (not defined $cb) {
         return $self->_search($self->table, undef, $where)
-            ->hashes->map(sub { $self->_collapse($_) });
+          ->hashes->map(sub { $self->_collapse($_) });
     }
 
     # non-blocking
@@ -136,7 +136,7 @@ sub add($self, $row, $cb = undef) {
     weaken $self;
 
     return $self->_collapse($self->orm->pg->db->query(@sql)->hash)
-        unless defined $cb;
+      unless defined $cb;
 
     $self->orm->pg->db->query(
         @sql,
