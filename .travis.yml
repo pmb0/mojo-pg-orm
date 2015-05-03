@@ -2,11 +2,16 @@
 language: perl
 perl:
   - "5.20"
+  - "5.18"
+addons:
+  postgresql: "9.4"
 env:
-  - "HARNESS_OPTIONS=j9 TEST_EV=1 TEST_POD=1 TEST_SOCKS=1 TEST_TLS=1"
+  - "HARNESS_OPTIONS=j9 TEST_POD=1 TEST_ONLINE=postgresql://postgres@/mojo_pg_orm_test"
 install:
   - "cpanm -n Mojolicious Lingua::EN::Inflect SQL::Abstract EV IO::Socket::Socks IO::Socket::SSL Net::DNS::Native Test::Pod Test::Pod::Coverage"
   - "cpanm -n --installdeps ."
+before_script:
+  - psql -c 'create database mojo_pg_orm_test;' -U postgres
 sudo: false
 notifications:
   email: false
