@@ -23,10 +23,6 @@ sub new {
 }
 
 sub retrieve_columns($self) {
-    # my $self = __PACKAGE__->new(
-    #     orm      => $orm,
-    #     relation => $orm->_get_relation_name($class)
-    # );
 
     # Retrieve table columns
     my $result = $self->_search(
