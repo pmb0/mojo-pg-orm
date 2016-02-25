@@ -153,7 +153,7 @@ sub update {
     my ($self, $data) = (shift, shift);
     my $cb = pop @_;
     my $where;
-    if (ref($cb) eq 'CODE') {
+    if (ref($cb) eq 'CODE' || !defined($cb)) {
         $where = shift // {};
     }
     else {
